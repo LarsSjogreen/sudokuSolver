@@ -1,9 +1,10 @@
 fs = require('fs');
 var _ = require('underscore');
 
-var sudoku = [];
+function sudokuSolver() {
+}
 
-function generateEmpty() {
+sudokuSolver.prototype.generateEmpty = function() {
 	var newSudoku = [];
 	for (var i=0;i<9;i++) {
 		newSudoku[i] = [];
@@ -14,8 +15,8 @@ function generateEmpty() {
 	return newSudoku;
 }
 
-function readSudoku(filename) {
-	emptySudoku = generateEmpty();
+sudokuSolver.prototype.readSudoku = function(filename) {
+	emptySudoku = this.generateEmpty();
 	var data = fs.readFileSync(filename, 'utf8');
 		var rows = data.split('\n');
 		var rC = 0;
@@ -36,11 +37,11 @@ function readSudoku(filename) {
 	return emptySudoku;
 }
 
-function checkPosition(sudoku, row, column) {
-	return _.intersection(checkRow(sudoku,row), checkColumn(sudoku,column), checkBox(sudoku,row,column)).sort();
+sudokuSolver.prototype.checkPosition = function(sudoku, row, column) {
+	return _.intersection(this.checkRow(sudoku,row), this.checkColumn(sudoku,column), this.checkBox(sudoku,row,column)).sort();
 }
 
-function checkRow(sudoku, row) {
+sudokuSolver.prototype.checkRow = function(sudoku, row) {
 	var left = [];
 	for (var i=1;i<10;i++) {
 		var hasI = false;
@@ -56,7 +57,7 @@ function checkRow(sudoku, row) {
 	return left;
 }
 
-function checkColumn(sudoku, column) {
+sudokuSolver.prototype.checkColumn = function(sudoku, column) {
 	var left = [];
 	for (var i=1;i<10;i++) {
 		var hasI = false;
@@ -72,10 +73,10 @@ function checkColumn(sudoku, column) {
 	return left;
 }
 
-function checkBox(sudoku, row, column) {
+sudokuSolver.prototype.checkBox = function(sudoku, row, column) {
 	var left = [];
-	var startRow = getBoxStart(row);
-	var startColumn = getBoxStart(column);
+	var startRow = this.getBoxStart(row);
+	var startColumn = this.getBoxStart(column);
 	for (var num = 1;num<10;num++) {
 		var hasI = false;
 		for (var r =0;r<3;r++) {
@@ -92,29 +93,35 @@ function checkBox(sudoku, row, column) {
 	return left;
 }
 
-function getBoxStart(row) {
+sudokuSolver.prototype.getBoxStart = function(row) {
 	return (Math.floor(row/3)*3);
 }
 
-console.log('Sudoku solver v0.2');
-sudoku = readSudoku('./test.txt');
-console.log();
-console.log('Before:');
-console.log(sudoku);
-console.log();
+sudokuSolver.prototype.main = function() {
+	var sudoku = [];
+	sud = new sudokuSolver();
+	console.log('Sudoku solver v0.2');
+	sudoku = sud.readSudoku('./test.txt');
+	console.log();
+	console.log('Before:');
+	console.log(sudoku);
+	console.log();
 
-for (var i=0;i<10;i++) {
-	for (var row=0;row<9;row++) {
-		for (var col=0;col<9;col++) {
-			if (sudoku[row][col] == 0) {
-				var pos = checkPosition(sudoku, row, col);
-				if (pos.length === 1) {
-					sudoku[row][col] = parseInt(pos[0]);
+	for (var i=0;i<10;i++) {
+		for (var row=0;row<9;row++) {
+			for (var col=0;col<9;col++) {
+				if (sudoku[row][col] == 0) {
+					var pos = sud.checkPosition(sudoku, row, col);
+					if (pos.length === 1) {
+						sudoku[row][col] = parseInt(pos[0]);
+					}
 				}
 			}
 		}
 	}
+	console.log();
+	console.log('After:');
+	console.log(sudoku);
 }
-console.log();
-console.log('After:');
-console.log(sudoku);
+//main();
+module.exports = sudokuSolver;

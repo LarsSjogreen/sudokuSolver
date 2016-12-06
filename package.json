@@ -2,14 +2,17 @@
   "name": "javascript",
   "version": "1.0.0",
   "description": "Sudoku solver",
-  "main": "sudokuSolver.js",
+  "main": "app/sudokuSolver.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "keywords": [
     "Learning",
     "Sudoku"
   ],
   "author": "Lars Sjögreen",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^3.5.0"
+  }
 }
