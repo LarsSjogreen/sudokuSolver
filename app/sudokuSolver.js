@@ -14,6 +14,32 @@ var sudokuSolver = (function() {
 		return newSudoku;
 	};
 
+	var generatePotentials = function() {
+		var potentials = [];
+		for (var i=0;i<9;i++) {
+			potentials[i] = [];
+			for (var j=0;j<9;j++) {
+				potentials[i][j] = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+			}
+		}
+		return potentials;
+	};
+
+	var preparePotentials = function(potentials, sudoku) {
+		for (var i=0;i<9;i++) {
+			for (var j=0;j<9;j++) {
+				var currentPos = sud.checkPosition(sudoku, i, j);
+				potentials[i][j].clear();
+				if (currentPos.length > 1) {
+					currentPos.forEach(function(number) {
+						potentials[i][j].add(number);
+					});
+				}
+			}
+		}		
+		return potentials;
+	};
+
 	var readSudoku = function(filename) {
 		aSudoku = this.generateEmpty();
 		var data = fs.readFileSync(filename, 'utf8');
@@ -40,36 +66,34 @@ var sudokuSolver = (function() {
 		return _.intersection(this.checkRow(sudoku,row), this.checkColumn(sudoku,column), this.checkBox(sudoku,row,column)).sort();
 	};
 	
-	var checkRow = function(sudoku, row) {
+	var checkRowOrColumn = function(sudoku, rowOrColumn, isRowCheck) {
 		var left = [];
 		for (var i=1;i<10;i++) {
 			var hasI = false;
 			for (var j=0;j<9;j++) {
-				if (sudoku[row][j] == i) {
-					hasI = true;
+				if (isRowCheck) {
+					if (sudoku[rowOrColumn][j] == i) {
+						hasI = true;
+					}
+				} else {
+					if (sudoku[j][rowOrColumn] == i) {
+						hasI = true;
+					}
 				}
 			}
 			if (! hasI) {
 				left.push(i);
 			}
 		}
-		return left;
+		return left;		
+	}
+
+	var checkRow = function(sudoku, row) {
+		return checkRowOrColumn(sudoku, row, true);
 	};
 	
 	var checkColumn = function(sudoku, column) {
-		var left = [];
-		for (var i=1;i<10;i++) {
-			var hasI = false;
-			for (var j=0;j<9;j++) {
-				if (sudoku[j][column] == i) {
-					hasI = true;
-				}
-			}
-			if (! hasI) {
-				left.push(i);
-			}
-		}
-		return left;
+		return checkRowOrColumn(sudoku, column, false);
 	};
 	
 	var checkBox = function(sudoku, row, column) {
@@ -117,34 +141,50 @@ var sudokuSolver = (function() {
 	
 		while (fs.existsSync('./sudokus/' + s + '.txt')) {
 			sudoku = this.readSudoku('./sudokus/' + s + '.txt');
-	//		console.log(sudoku);
+
+			sudoku = this.soleCandidateSolve(sudoku, s);
 		
-			for (var i=0;i<10;i++) {
-				for (var row=0;row<9;row++) {
-					for (var col=0;col<9;col++) {
-						if (sudoku[row][col] == 0) {
-							var pos = sud.checkPosition(sudoku, row, col);
-							if (pos.length === 1) {
-								sudoku[row][col] = parseInt(pos[0]);
-							}
-						}
-					}
-				}
-				if (this.isSolved(sudoku)) {
-					console.log('Solved ' + s + '.txt after ' + i + ' iterations');
-					break;
-				}
-			}
-	//		console.log(sudoku);
 			if (! this.isSolved(sudoku)) {
-				console.log("Couldn't solve " + s + ".txt" );
+				console.log("Couldn't solve " + s + ".txt with sole candidate strategy");
+				sudoku = this.uniqueCandidateSolve(sudoku);
+				var potentials = generatePotentials();
+				potentials = preparePotentials(potentials, sudoku);
+//				console.log(potentials);
+			} else {
+				console.log('Solved ' + s + '.txt');
 			}
 			s++;
 		}
 	};
 
+	var uniqueCandidateSolve = function(sudoku) {
+		return sudoku;
+	};
+
+	var soleCandidateSolve = function(sudoku, s) {
+		for (var i=0;i<10;i++) {
+			for (var row=0;row<9;row++) {
+				for (var col=0;col<9;col++) {
+					if (sudoku[row][col] == 0) {
+						var pos = sud.checkPosition(sudoku, row, col);
+						if (pos.length === 1) {
+							sudoku[row][col] = parseInt(pos[0]);
+						}
+					}
+				}
+			}
+			if (this.isSolved(sudoku)) {
+				break;
+			}
+		}
+
+		return sudoku;
+	};
+
 	return {
 		generateEmpty: generateEmpty,
+		generatePotentials: generatePotentials,
+		preparePotentials: preparePotentials,
 		readSudoku: readSudoku,
 		checkPosition: checkPosition,
 		checkRow: checkRow,
@@ -152,6 +192,8 @@ var sudokuSolver = (function() {
 		checkBox: checkBox,
 		isSolved: isSolved,
 		getBoxStart: getBoxStart,
+		soleCandidateSolve: soleCandidateSolve,
+		uniqueCandidateSolve: uniqueCandidateSolve,
 		main: main
 	};
 }());
