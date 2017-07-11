@@ -25,6 +25,38 @@ var sudokuSolver = (function() {
 		return potentials;
 	};
 
+	Set.prototype.equals = function(otherSet) {
+		var hasAll = true;
+		for (var number of this.entries()) {
+			if (! otherSet.has(number)) {
+				hasAll = false;
+			}
+		}
+		return hasAll;
+	}
+
+	// Finds the first two number pair in a row and returns the pair and the positions 
+	var findRowPair = function(potentials, row) {
+		var pairNumbers = new Set();
+		var pairPositions = new Set();
+		for (var i=0;i<9;i++) {
+			pairCount = 1;
+			var pairs = new Set();
+			start = i;
+			testPair = potentials[row][start];
+			for (var j=start+1;j<9;j++) {
+				if (testPair.equals(potentials[row][j])) {
+					pairCount++;
+				}
+			}
+			if (pairCount === 2) {
+//				console.log("Row pair found");
+			} else {
+//				console.log("Number of equals: " + pairCount);
+			}
+		}
+	}
+
 	var preparePotentials = function(potentials, sudoku) {
 		for (var i=0;i<9;i++) {
 			for (var j=0;j<9;j++) {
@@ -149,6 +181,7 @@ var sudokuSolver = (function() {
 				sudoku = this.uniqueCandidateSolve(sudoku);
 				var potentials = generatePotentials();
 				potentials = preparePotentials(potentials, sudoku);
+				findRowPair(potentials, 0);
 //				console.log(potentials);
 			} else {
 				console.log('Solved ' + s + '.txt');
