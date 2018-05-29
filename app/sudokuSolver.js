@@ -3,16 +3,20 @@ var _ = require('underscore');
 
 var sudokuSolver = (function() {
 
-	var generateEmpty = function() {
+	var generateAndFillBoard = function(number) {
 		var newSudoku = [];
 		for (var i=0;i<9;i++) {
 			newSudoku[i] = [];
 			for (var j=0;j<9;j++) {
-				newSudoku[i][j] = 0;
+				newSudoku[i][j] = number;
 			}
 		}
 		return newSudoku;
 	};
+
+	var generateEmpty = function() {
+		return generateAndFillBoard(0);
+	}
 
 	var generatePotentials = function() {
 		var potentials = [];
@@ -216,6 +220,7 @@ var sudokuSolver = (function() {
 
 	return {
 		generateEmpty: generateEmpty,
+		generateAndFillBoard: generateAndFillBoard,
 		generatePotentials: generatePotentials,
 		preparePotentials: preparePotentials,
 		readSudoku: readSudoku,
