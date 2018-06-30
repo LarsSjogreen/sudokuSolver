@@ -39,7 +39,7 @@ var sudokuSolver = (function() {
 		return hasAll;
 	}
 
-	// Finds the first two number pair in a row and returns the pair and the positions 
+	// Finds the first two number pair in a row and returns the pair and the positions
 	var findRowPair = function(potentials, row) {
 		var pairNumbers = new Set();
 		var pairPositions = new Set();
@@ -72,7 +72,7 @@ var sudokuSolver = (function() {
 					});
 				}
 			}
-		}		
+		}
 		return potentials;
 	};
 
@@ -82,7 +82,7 @@ var sudokuSolver = (function() {
 			var rows = data.split('\n');
 			var rC = 0;
 			var cC = 0;
-	
+
 			rows.forEach(function(row) {
 				var columns = row.split("");
 				cC = 0;
@@ -101,7 +101,7 @@ var sudokuSolver = (function() {
 	var checkPosition = function(sudoku, row, column) {
 		return _.intersection(this.checkRow(sudoku,row), this.checkColumn(sudoku,column), this.checkBox(sudoku,row,column)).sort();
 	};
-	
+
 	var checkRowOrColumn = function(sudoku, rowOrColumn, isRowCheck) {
 		var left = [];
 		for (var i=1;i<10;i++) {
@@ -121,17 +121,17 @@ var sudokuSolver = (function() {
 				left.push(i);
 			}
 		}
-		return left;		
+		return left;
 	}
 
 	var checkRow = function(sudoku, row) {
 		return checkRowOrColumn(sudoku, row, true);
 	};
-	
+
 	var checkColumn = function(sudoku, column) {
 		return checkRowOrColumn(sudoku, column, false);
 	};
-	
+
 	var checkBox = function(sudoku, row, column) {
 		var left = [];
 		var startRow = this.getBoxStart(row);
@@ -155,7 +155,7 @@ var sudokuSolver = (function() {
 	var getBoxStart = function(row) {
 		return (Math.floor(row/3)*3);
 	};
-	
+
 	var isSolved = function(sudoku) {
 		for (var i=0;i<9;i++) {
 			var hasZero = false;
@@ -167,19 +167,19 @@ var sudokuSolver = (function() {
 		}
 		return !hasZero;
 	};
-	
+
 	var main = function() {
 		var sudoku = [];
 		sud = this;
 		console.log('Sudoku solver v0.25');
 		console.log();
 		var s = 1;
-	
+
 		while (fs.existsSync('./sudokus/' + s + '.txt')) {
 			sudoku = this.readSudoku('./sudokus/' + s + '.txt');
 
 			sudoku = this.soleCandidateSolve(sudoku, s);
-		
+
 			if (! this.isSolved(sudoku)) {
 				console.log("Couldn't solve " + s + ".txt with sole candidate strategy");
 				sudoku = this.uniqueCandidateSolve(sudoku);
